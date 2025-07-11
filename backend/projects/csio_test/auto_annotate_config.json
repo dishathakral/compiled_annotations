@@ -1,0 +1,5 @@
+{
+  "model_family": "yolov8",
+  "model_version": "yolov8n.pt",
+  "subset": "subset_1/subset_1.json"
+}

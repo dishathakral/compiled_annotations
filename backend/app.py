@@ -1,5 +1,4 @@
 
-
 # Minimal in-memory training status for frontend
 TRAINING_STATUS = {}
 
@@ -20,6 +19,31 @@ CORS(app)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECTS_DIR = os.path.join(BASE_DIR, 'projects')
 os.makedirs(PROJECTS_DIR, exist_ok=True)
+
+# API endpoint to get all model versions (global and project-specific) for view predictions page
+@app.route('/api/projects/<project_name>/model_versions', methods=['GET'])
+def get_all_model_versions(project_name):
+    """
+    Returns all model versions (global and project-specific) for a given model family and project.
+    Query params:
+      - family: model family (e.g., yolov8)
+    """
+    family = request.args.get('family')
+    allowed_exts = ('.pt', '.pth', '.onnx', '.ckpt', '.bin', '.h5', '.tflite')
+    project_versions = []
+    global_versions = []
+    # Project-specific models
+    if family:
+        project_models_dir = os.path.join(PROJECTS_DIR, project_name, 'models')
+        if os.path.isdir(project_models_dir):
+            project_versions = [f for f in os.listdir(project_models_dir) if f.lower().startswith(family.lower()) and f.lower().endswith(allowed_exts)]
+        # Global models
+        fam_path = os.path.join(MODELS_DIR, family)
+        if os.path.isdir(fam_path):
+            global_versions = [f for f in os.listdir(fam_path) if os.path.isfile(os.path.join(fam_path, f)) and f.lower().endswith(allowed_exts)]
+    # Always show both: global first, then project-specific (even if names overlap)
+    return jsonify(global_versions + project_versions)
+
 
 
 # Endpoint to keep the fine-tuned model for a project
@@ -165,9 +189,10 @@ def custom_train(project_name):
 
     import shutil
     from ultralytics import YOLO
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    PROJECTS_DIR = os.path.join(BASE_DIR, 'backend', 'projects')
-    MODELS_DIR = os.path.join(BASE_DIR, 'models', 'yolov8')
+    # Use correct BASE_DIR and PROJECTS_DIR as in the rest of the app
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    PROJECTS_DIR = os.path.join(BASE_DIR, 'projects')
+    MODELS_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'models', 'yolov8'))
     # Ensure YOLO dataset is created inside the project folder, not globally
     PROJECT_DIR = os.path.join(PROJECTS_DIR, project_name)
     YOLO_DATASET_DIR = os.path.join(PROJECT_DIR, 'yolo_dataset')
@@ -197,12 +222,17 @@ def custom_train(project_name):
             os.makedirs(folder, exist_ok=True)
         ann_path = os.path.join(PROJECT_DIR, 'manual_annotations.json')
         img_dir = os.path.join(PROJECT_DIR, 'images')
+        # Look for model in both global and project-specific locations
         yolo_model = os.path.join(MODELS_DIR, model_version)
-        # Do not create MODELS_DIR if it doesn't exist; just check for model file
         if not os.path.isfile(yolo_model):
-            print(f"[TRAIN] ❌ Model file not found: {yolo_model}")
-            TRAINING_STATUS[project_name] = {'status': 'error', 'error': f'Model file not found: {yolo_model}'}
-            return
+            # Try project-specific model path
+            project_model_path = os.path.join(PROJECTS_DIR, project_name, 'models', model_version)
+            if os.path.isfile(project_model_path):
+                yolo_model = project_model_path
+            else:
+                print(f"[TRAIN] ❌ Model file not found: {yolo_model} or {project_model_path}")
+                TRAINING_STATUS[project_name] = {'status': 'error', 'error': f'Model file not found: {yolo_model} or {project_model_path}'}
+                return
         with open(ann_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         label_map = {name: i for i, name in enumerate(data['categories'])}
@@ -618,8 +648,22 @@ def list_models():
         if os.path.isdir(fam_path):
             versions = [f for f in os.listdir(fam_path)
                         if os.path.isfile(os.path.join(fam_path, f)) and f.lower().endswith(allowed_exts)]
+            # Add project-specific versions for this family
+            for project in os.listdir(PROJECTS_DIR):
+                project_models_dir = os.path.join(PROJECTS_DIR, project, 'models')
+                if os.path.isdir(project_models_dir):
+                    project_versions = [f for f in os.listdir(project_models_dir)
+                        if f.lower().startswith(family.lower()) and f.lower().endswith(allowed_exts)]
+                    versions.extend(project_versions)
             if versions:
-                result[family] = versions
+                # Remove duplicates, preserve order
+                seen = set()
+                unique_versions = []
+                for v in versions:
+                    if v not in seen:
+                        unique_versions.append(v)
+                        seen.add(v)
+                result[family] = unique_versions
     print(f"/api/models/list result: {result}")  # Debug print
     return jsonify(result)
 
@@ -633,14 +677,22 @@ def get_model_families():
 @app.route('/api/models/versions', methods=['GET'])
 def get_model_versions():
     family = request.args.get('family')
-    if not family:
-        return jsonify([])
-    fam_path = os.path.join(MODELS_DIR, family)
+    project = request.args.get('project')
     allowed_exts = ('.pt', '.pth', '.onnx', '.ckpt', '.bin', '.h5', '.tflite')
-    if not os.path.isdir(fam_path):
-        return jsonify([])
-    versions = [f for f in os.listdir(fam_path) if os.path.isfile(os.path.join(fam_path, f)) and f.lower().endswith(allowed_exts)]
-    return jsonify(versions)
+    project_versions = []
+    global_versions = []
+    # Project-specific models
+    if project and family:
+        project_models_dir = os.path.join(PROJECTS_DIR, project, 'models')
+        if os.path.isdir(project_models_dir):
+            project_versions = [f for f in os.listdir(project_models_dir) if f.lower().startswith(family.lower()) and f.lower().endswith(allowed_exts)]
+    # Global models
+    if family:
+        fam_path = os.path.join(MODELS_DIR, family)
+        if os.path.isdir(fam_path):
+            global_versions = [f for f in os.listdir(fam_path) if os.path.isfile(os.path.join(fam_path, f)) and f.lower().endswith(allowed_exts)]
+    # Always show both: global first, then project-specific (even if names overlap)
+    return jsonify(global_versions + project_versions)
 
 @app.route('/api/models/descriptions', methods=['GET'])
 def get_model_descriptions():
@@ -748,10 +800,15 @@ def run_auto_label(project_name):
     subset = config.get('subset')
     if not (model_family and model_version and subset):
         return jsonify({'error': 'Incomplete config'}), 400
-    # Model path
+    # Model path: check global first, then project-specific
     model_path = os.path.join(MODELS_DIR, model_family, model_version)
     if not os.path.exists(model_path):
-        return jsonify({'error': f'Model file not found: {model_path}'}), 404
+        # Try project-specific path
+        project_model_path = os.path.join(PROJECTS_DIR, project_name, 'models', model_version)
+        if os.path.exists(project_model_path):
+            model_path = project_model_path
+        else:
+            return jsonify({'error': f'Model file not found: {model_path} or {project_model_path}'}), 404
     # Subset path
     subset_path = os.path.join(project_dir, subset)
     if not os.path.exists(subset_path):

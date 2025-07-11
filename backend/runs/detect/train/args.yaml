@@ -1,7 +1,7 @@
 task: detect
 mode: train
 model: C:\Users\CSIO\Desktop\disha\compiled_automate_annotation\models\yolov8\yolov8n.pt
-data: C:\Users\CSIO\Desktop\disha\compiled_automate_annotation\backend\projects\yolo\yolo_dataset\data.yaml
+data: C:\Users\CSIO\Desktop\disha\compiled_automate_annotation\backend\projects\csio_test\yolo_dataset\data.yaml
 epochs: 1
 time: null
 patience: 100

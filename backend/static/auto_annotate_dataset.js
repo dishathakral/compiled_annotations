@@ -578,31 +578,34 @@ document.addEventListener('DOMContentLoaded', function() {
     // When rendering subset images, always use the #subset-images container
 });
 
-// New code to fetch model families and versions
-document.addEventListener('DOMContentLoaded', async function() {
+// Improved: Always update model version dropdown on family change, using project-aware endpoint
+document.addEventListener('DOMContentLoaded', function() {
     const modelFamilySel = document.getElementById('modelFamily');
     const modelVersionSel = document.getElementById('modelVersion');
+    const projectName = (typeof getCurrentProjectName === 'function') ? getCurrentProjectName() : null;
 
     async function fetchModelFamilies() {
         const res = await fetch(`${BACKEND_URL}/api/models/families`);
         return await res.json();
     }
 
-    async function fetchModelVersions(family) {
-        const res = await fetch(`${BACKEND_URL}/api/models/versions?family=${encodeURIComponent(family)}`);
+    async function fetchModelVersions(family, project) {
+        let url = `${BACKEND_URL}/api/models/versions?family=${encodeURIComponent(family)}`;
+        if (project) url += `&project=${encodeURIComponent(project)}`;
+        const res = await fetch(url);
         return await res.json();
     }
 
-    // Populate model families
-    const families = await fetchModelFamilies();
-    modelFamilySel.innerHTML = '<option value="">Select family</option>' +
-        families.map(fam => `<option value="${fam}">${fam}</option>`).join('');
+    fetchModelFamilies().then(families => {
+        modelFamilySel.innerHTML = '<option value="">Select family</option>' +
+            families.map(fam => `<option value="${fam}">${fam}</option>`).join('');
+    });
 
     modelFamilySel.onchange = async function() {
         const fam = modelFamilySel.value;
         modelVersionSel.innerHTML = '<option value="">Select version</option>';
         if (fam) {
-            const versions = await fetchModelVersions(fam);
+            const versions = await fetchModelVersions(fam, projectName);
             modelVersionSel.innerHTML += versions.map(ver => `<option value="${ver}">${ver}</option>`).join('');
         }
     };

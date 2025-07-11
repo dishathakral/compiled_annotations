@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Infrared Object Detection - Home</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(120deg, #f7faff 0%, #e3e9f7 100%);
+      margin: 0;
+      min-height: 100vh;
+    }
+    .main-header {
+      background: #fff;
+      box-shadow: 0 2px 12px #0001;
+      padding: 32px 0 18px 0;
+      text-align: center;
+      border-bottom: 1.5px solid #e3e9f7;
+    }
+    .main-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1a237e;
+      margin: 0 0 8px 0;
+      letter-spacing: 1px;
+    }
+    .main-header p {
+      color: #4b5563;
+      font-size: 1.15rem;
+      margin: 0;
+    }
+    .projects-section {
+      max-width: 1200px;
+      margin: 36px auto 0 auto;
+      padding: 0 24px;
+    }
+    .projects-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .projects-header h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #222b45;
+      margin: 0;
+    }
+    .primary-btn {
+      background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 1px 4px #1976d210;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .primary-btn:hover {
+      background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%);
+      box-shadow: 0 4px 16px #1976d230;
+    }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+    }
+    .project-card {
+      background: linear-gradient(120deg, #e3f0ff 0%, #b3d1ff 100%);
+      border-radius: 16px;
+      box-shadow: 0 2px 16px #1976d230;
+      padding: 28px 24px 22px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transition: box-shadow 0.2s, transform 0.2s;
+      position: relative;
+      min-height: 210px;
+      border: 2px solid #1976d2;
+    }
+    .project-card:hover {
+      box-shadow: 0 8px 32px #1976d250;
+      transform: translateY(-4px) scale(1.025);
+      border-color: #0d47a1;
+    }
+    .project-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #0d47a1;
+      margin-bottom: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .project-title:hover {
+      color: #1976d2;
+      text-decoration: underline;
+    }
+    .project-meta {
+      color: #1976d2;
+      font-size: 1.01rem;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .project-desc {
+      color: #0d47a1;
+      font-size: 1.01rem;
+      margin-bottom: 10px;
+      font-style: italic;
+      min-height: 24px;
+      width: 100%;
+      background: #e3f2fd;
+      border-radius: 6px;
+      padding: 4px 8px;
+      border: 1px solid #bbdefb;
+      box-sizing: border-box;
+    }
+    .project-actions {
+      margin-top: auto;
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+    .project-action-btn {
+      background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 18px;
+      font-size: 1.05rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 4px #1976d210;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .project-action-btn:hover {
+      background: linear-gradient(90deg, #0d47a1 0%, #1976d2 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px #1976d250;
+    }
+    .delete-btn {
+      background: #fff;
+      color: #d32f2f;
+      border: 1px solid #d32f2f;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+    }
+    .delete-btn:hover {
+      background: #d32f2f;
+      color: #fff;
+    }
+    .empty-state {
+      text-align: center;
+      color: #888;
+      font-size: 1.2rem;
+      margin-top: 40px;
+    }
+    @media (max-width: 700px) {
+      .main-header h1 { font-size: 1.5rem; }
+      .projects-section { padding: 0 6px; }
+      .projects-grid { gap: 16px; }
+      .project-card { padding: 16px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-header">
+    <h1>Infrared Object Detection</h1>
+    <p>Manage your datasets and annotation projects. Powered by AI, inspired by Roboflow.</p>
+    
+  </div>
+  <div class="projects-section">
+    <div class="projects-header">
+      <h2>Projects</h2>
+      <button id="createProjectBtn" class="primary-btn">➕ New Project</button>
+    </div>
+    <!-- Class distribution bar chart removed as per user request -->
+    <div id="projectList">
+      <div class="empty-state">Loading projects...</div>
+    </div>
+  </div>
+  <!-- Chart.js removed as per user request -->
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <!-- Class distribution bar chart script removed as per user request -->
+  <script>
+    // Enhanced project list rendering for blue theme, emojis, description, and delete
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load project descriptions from localStorage
+      function getProjectDesc(name) {
+        return localStorage.getItem('desc_' + name) || '';
+      }
+      function setProjectDesc(name, desc) {
+        localStorage.setItem('desc_' + name, desc);
+      }
+      fetch('/api/projects')
+        .then(res => res.json())
+        .then(projects => {
+          const listDiv = document.getElementById('projectList');
+          if (!projects || projects.length === 0) {
+            listDiv.innerHTML = `<div class='empty-state'>No projects yet. Click "New Project" to get started!</div>`;
+            return;
+          }
+          let html = `<div class='projects-grid'>`;
+          projects.forEach((p, idx) => {
+            // Pick a unique emoji for each project card action
+            const emojiOpen = ['🚀','🛰️','🗂️','📁','🔎','🧩','🧪','🦾','🤖','🧠'][idx%10];
+            const emojiDesc = '📝';
+            const emojiDelete = '🗑️';
+            html += `
+              <div class='project-card' data-project='${p}'>
+                <a class='project-title' href='project.html?name=${encodeURIComponent(p)}' title='Open project'>${emojiOpen} ${p}</a>
+                <div class='project-meta'>Project name: <b>${p}</b></div>
+                <textarea class='project-desc' placeholder='${emojiDesc} Add a short description...' oninput="localStorage.setItem('desc_${p}', this.value)">${getProjectDesc(p)}</textarea>
+                <div class='project-actions'>
+                  <button class='project-action-btn' onclick="window.location.href='project.html?name=${encodeURIComponent(p)}'">${emojiOpen} Open</button>
+                  <button class='project-action-btn delete-btn' onclick="if(confirm('Delete project ${p}?')) deleteProject('${p}', this)">${emojiDelete} Delete</button>
+                </div>
+              </div>
+            `;
+          });
+          html += `</div>`;
+          listDiv.innerHTML = html;
+        });
+      document.getElementById('createProjectBtn').onclick = function() {
+        const name = prompt("Enter new project name:");
+        if (name) {
+          fetch('/api/projects', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({project_name: name})
+          })
+          .then(res => res.json().then(data => ({status: res.status, body: data})))
+          .then(result => {
+            if (result.status === 200) {
+              alert(result.body.message);
+              location.reload();
+            } else {
+              alert(result.body.error);
+            }
+          })
+          .catch(() => alert('Failed to create project. Backend may be down.'));
+        }
+      };
+      // Delete project function
+      window.deleteProject = function(name, btn) {
+        if (!name) return;
+        fetch('/api/projects/' + encodeURIComponent(name), { method: 'DELETE' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.message) {
+              // Remove card from UI
+              const card = btn.closest('.project-card');
+              if (card) card.remove();
+              // Remove description from localStorage
+              localStorage.removeItem('desc_' + name);
+              alert(data.message);
+            } else {
+              alert(data.error || 'Failed to delete project.');
+            }
+          })
+          .catch(() => alert('Failed to delete project.'));
+      }
+    });
+  </script>
+</body>
+</html>

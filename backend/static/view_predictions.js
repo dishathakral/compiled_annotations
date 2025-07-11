@@ -839,7 +839,10 @@ document.addEventListener('DOMContentLoaded', async function() {
       // Populate model versions
       customModelSelect.innerHTML = '<option>Loading...</option>';
       try {
-        const resp = await fetch('http://localhost:5000/api/models/versions?family=yolov8');
+        // Get model family (hardcoded to yolov8 for now, or update if you add a dropdown for family)
+        const modelFamily = 'yolov8';
+        // Use the new endpoint that includes both global and project-specific models
+        const resp = await fetch(`/api/projects/${encodeURIComponent(project)}/model_versions?family=${encodeURIComponent(modelFamily)}`);
         const versions = await resp.json();
         customModelSelect.innerHTML = '';
         versions.forEach(v => {
