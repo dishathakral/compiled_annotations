@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Project Details</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #f7faff;
+    }
+    .container-flex {
+      display: flex;
+      flex-direction: row;
+      gap: 32px;
+      max-width: 1100px;
+      margin: 40px auto 0 auto;
+      align-items: flex-start;
+    }
+    .container-main {
+      flex: 1 1 0;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 16px #1976d220;
+      padding: 40px 24px 32px 24px;
+      min-width: 0;
+      min-height: 600px;
+    }
+    .container-side {
+      flex: 0 0 320px;
+      background: #f7faff;
+      border-radius: 14px;
+      box-shadow: 0 2px 16px #1976d10;
+      padding: 32px 24px 24px 24px;
+      min-width: 260px;
+      max-width: 340px;
+      margin-left: 0;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #1976d2;
+      margin-bottom: 32px;
+      letter-spacing: 1px;
+    }
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #0d47a1;
+      margin-top: 32px;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+    }
+    label, input, button, select {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 1.08rem;
+    }
+    #uploadSection, #metaSection, #annotateSection {
+      margin-bottom: 32px;
+    }
+    #uploadSection input[type="file"] {
+      margin-bottom: 12px;
+      font-size: 1.08rem;
+    }
+    #uploadBtn {
+      margin-left: 12px;
+      padding: 8px 22px;
+      font-size: 1.08rem;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #uploadBtn:hover {
+      background: linear-gradient(90deg, #0d47a1 0%, #1976d2 100%);
+    }
+    #uploadMsg {
+      margin-top: 10px;
+      color: #388e3c;
+      font-size: 1.05rem;
+    }
+    #metaInfo {
+      font-size: 1.08rem;
+      color: #333;
+      background: #f7faff;
+      border-radius: 6px;
+      padding: 10px 16px;
+      margin-top: 6px;
+    }
+    #manualBtn, #autoBtn {
+      margin-right: 18px;
+      margin-bottom: 10px;
+      padding: 10px 26px;
+      font-size: 1.08rem;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #manualBtn:hover, #autoBtn:hover {
+      background: linear-gradient(90deg, #0d47a1 0%, #1976d2 100%);
+    }
+    .back-btn {
+      margin-top: 32px;
+      padding: 10px 24px;
+      font-size: 1.08rem;
+      border-radius: 6px;
+      border: 1.5px solid #1976d2;
+      background: #fff;
+      color: #1976d2;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .back-btn:hover {
+      background: #1976d2;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-flex">
+    <div class="container-main">
+      <h1 id="projectTitle"></h1>
+      <div id="uploadSection">
+        <h2>Step 1: Import Data (Upload Folder as .zip)</h2>
+        <input type="file" id="zipInput" accept=".zip" />
+        <button id="uploadBtn">Upload</button>
+        <div id="uploadMsg"></div>
+      </div>
+      <div id="metaSection">
+        <h2>Step 2: Project Metadata</h2>
+        <div id="metaInfo"></div>
+      </div>
+      <div id="annotateSection">
+        <h2>Step 3: Annotate Data</h2>
+        <button id="manualBtn">📝 Manually Annotate Data</button>
+        <button id="autoBtn" onclick="window.location.href='auto_annotate_dataset.html'">⚡ Automatic Annotation</button>
+      </div>
+      <button class="back-btn" onclick="window.location.href='index.html'">⬅️ Back to Home</button>
+    </div>
+    <div class="container-side">
+      <h2 style="font-size:1.18rem;color:#1976d2;margin-top:0;margin-bottom:18px;">Model & Dataset Info</h2>
+      <div style="margin-bottom:18px;">
+        <div style="font-size:1.08rem;color:#333;font-weight:600;">Model Name:</div>
+        <div id="modelName" style="font-size:1.08rem;color:#0d47a1;margin-bottom:8px;">(not selected)</div>
+        <div style="font-size:1.08rem;color:#333;font-weight:600;">Model Info:</div>
+        <div id="modelInfo" style="font-size:1.01rem;color:#444;background:#e3f2fd;border-radius:6px;padding:6px 10px;margin-bottom:10px;min-height:32px;">No info available.</div>
+      </div>
+      <div>
+        <div style="font-size:1.08rem;color:#333;font-weight:600;">Class Distribution:</div>
+        <div id="classDist" style="font-size:1.01rem;color:#444;background:#e3f2fd;border-radius:6px;padding:6px 10px;min-height:32px;">No data.</div>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='project.js') }}"></script>
+</body>
+</html>

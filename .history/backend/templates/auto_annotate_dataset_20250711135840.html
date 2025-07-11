@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auto-Annotate Dataset</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .flex-row { display: flex; }
+    .sidebar {
+      width: 300px;
+      min-width: 220px;
+      background: #f7f7f7;
+      padding: 32px 20px 20px 20px;
+      border-right: 1.5px solid #ddd;
+      font-size: 1.18rem;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      box-shadow: 2px 0 8px #eee;
+    }
+    .sidebar h2 {
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
+    }
+    .sidebar label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 7px;
+      font-weight: 500;
+      font-size: 1.08rem;
+    }
+    .sidebar select {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 1.08rem;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #bbb;
+      background: #fff;
+    }
+    #modelDescription {
+      margin: 18px 0 10px 0;
+      font-size: 1.08rem;
+      color: #333;
+      min-height: 32px;
+    }
+    #modelSelectStatus {
+      font-size: 1.05rem;
+      color: #2a7;
+      margin-bottom: 10px;
+      min-height: 24px;
+    }
+    .main-content {
+      flex: 1;
+      padding: 32px 28px 28px 28px;
+    }
+    .primary-btn {
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 1.15rem;
+      padding: 14px 32px;
+      font-family: 'Inter', Arial, sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .primary-btn:hover {
+      background-color: #005a9e;
+    }
+    button, input[type="button"], input[type="submit"] {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 1.11rem;
+      padding: 12px 22px;
+      border-radius: 6px;
+      margin: 7px 0;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+    h1, h2, h3, label, select, input, .main-content {
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #222;
+      letter-spacing: 1px;
+    }
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 18px;
+    }
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 10px;
+    }
+    label {
+      font-size: 1.08rem;
+      color: #222;
+      font-weight: 500;
+    }
+    .main-content {
+      font-size: 1.09rem;
+      color: #222;
+    }
+    select, input[type="number"] {
+      font-size: 1.08rem;
+      border-radius: 6px;
+      border: 1.5px solid #bbb;
+      padding: 7px 10px;
+      margin-bottom: 10px;
+    }
+    #autoAnnotateModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    #autoAnnotateModal > div {
+      background: #fff;
+      padding: 32px 28px 24px 28px;
+      border-radius: 10px;
+      min-width: 340px;
+      max-width: 90vw;
+      box-shadow: 0 4px 32px #0002;
+      position: relative;
+    }
+    #closeAutoAnnotateModal {
+      position: absolute;
+      top: 10px;
+      right: 18px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container flex-row">
+    <div class="sidebar">
+      <h2>Model Selection</h2>
+      <label for="modelFamily">Model Family:</label>
+      <select id="modelFamily"></select>
+      <label for="modelVersion">Version:</label>
+      <select id="modelVersion"></select>
+      <div id="modelDescription"></div>
+      <div id="modelSelectStatus"></div>
+    </div>
+    <div class="main-content">
+      <h1>Auto-Annotate Dataset</h1>
+      <button id="complete-btn">📦 Complete Dataset</button>
+      <button id="manual-btn">📝 Select Images Manually</button>
+      <button id="random-btn">🎲 Random Subset</button>
+      <div id="manual-section" style="display:none; margin-top:20px;">
+        <h3>Select Images</h3>
+        <div id="manual-image-scroll" style="max-height:420px;overflow-y:auto;border:1px solid #eee;padding:10px 0 10px 10px;margin-bottom:12px;background:#fafbfc;">
+          <form id="manual-form"></form>
+        </div>
+        <button id="manual-submit">Create Manual Subset</button>
+      </div>
+      <div id="subset-section" style="display:none; margin-top:20px;">
+        <div style="position:sticky; top:0; z-index:2; background:#fafbfc; padding:8px 0 8px 0; border-bottom:1px solid #e0e0e0;">
+          <h3 style="margin:0 0 6px 0;">Subset Images</h3>
+          <!-- Place subset selection controls here (e.g., dropdowns, buttons) -->
+          <button id="select-all-subset" style="margin-right:8px;">Select All</button>
+          <button id="deselect-all-subset">Deselect All</button>
+        </div>
+        <div id="subset-image-scroll" style="max-height:420px;overflow-y:auto;border:1px solid #eee;padding:10px 0 10px 10px;margin-bottom:12px;background:#fafbfc;">
+          <div id="subset-images"></div>
+        </div>
+      </div>
+      <div id="random-section" style="display:none; margin-top:20px;">
+        <label>Random Subset %: <input type="number" id="random-percent" min="1" max="100" value="20">%</label>
+        <button id="random-submit">Create Random Subset</button>
+      </div>
+      <div id="result" style="margin-top:20px;"></div>
+      <button id="start-auto-annotate-btn" class="primary-btn" style="margin-top:32px; float:right; font-size:1.15rem; padding:12px 28px;">Auto Label With This Model</button>
+    </div>
+    <div id="autoAnnotateModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.35);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:32px 28px 24px 28px;border-radius:10px;min-width:340px;max-width:90vw;box-shadow:0 4px 32px #0002;position:relative;">
+        <span id="closeAutoAnnotateModal" style="position:absolute;top:10px;right:18px;font-size:1.5rem;cursor:pointer;">&times;</span>
+        <div id="autoAnnotateModalContent"></div>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='auto_annotate_dataset.js') }}"></script>
+  </div>
+</body>
+</html>

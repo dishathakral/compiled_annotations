@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manual Annotation</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .anno-flex { display: flex; gap: 24px; }
+    .anno-col { flex: 1; min-width: 0; }
+    .anno-img-list { max-height: 80vh; overflow-y: auto; }
+    .anno-img-thumb { width: 100%; max-width: 120px; margin-bottom: 10px; cursor: pointer; border: 2px solid #eee; }
+    .anno-img-thumb.selected { border: 2px solid #1976d2; }
+    .anno-canvas-wrap {
+      text-align: center;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-width: 0;
+      max-width: none;
+    }
+    #annotateCanvas {
+      display: block;
+      margin: 0 auto;
+      width: auto !important;
+      height: auto !important;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .anno-labels { margin-bottom: 18px; }
+    .anno-label-dropdown { width: 100%; margin-bottom: 10px; }
+    .anno-btn {
+      margin: 10px 0;
+      width: 100%;
+      font-size: 1.13rem;
+      padding: 12px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="backToReviewContainer" style="margin-bottom:18px; display:none;">
+      <button id="backToReviewBtn" class="anno-btn btn btn-outline-secondary" style="width:auto;min-width:120px;">&larr; Back to Review</button>
+    </div>
+    <h1 id="pageTitle">Automate Annotation</h1>
+    <div class="anno-flex" style="gap:40px;">
+      <!-- Left: Image list (narrower, grid, 2 images per row) -->
+      <div class="anno-col anno-img-list" id="imageList" style="flex:0 0 300px; max-width:300px; background:#f8f9fa; padding:12px 8px 8px 8px; border-radius:8px; box-shadow:0 1px 4px #0001; min-height:120px;">
+        <div id="tabSelector" style="display:flex;justify-content:center;gap:10px;margin-bottom:16px;position:sticky;top:0;z-index:2;background:#f8f9fa;padding:8px 0 4px 0;">
+          <button id="tabUnannotated" class="anno-btn btn btn-sm btn-light" style="min-width:120px;font-weight:bold;">Unannotated</button>
+          <button id="tabAnnotated" class="anno-btn btn btn-sm btn-light" style="min-width:120px;font-weight:bold;">Annotated</button>
+        </div>
+        <!-- Thumbnails will be rendered here -->
+      </div>
+      <!-- Center: Image and annotation canvas (editing column) -->
+      <div class="anno-col anno-canvas-wrap" style="min-width:480px;max-width:700px;margin-left:-30px;padding-top:0;padding-bottom:0;">
+        <div id="modeSelector" style="margin-bottom:8px; text-align:center;">
+          <label style="margin-right:12px;"><input type="radio" name="annoMode" id="drawModeRadio" value="draw" checked> Draw</label>
+          <label style="margin-right:12px;"><input type="radio" name="annoMode" id="panModeRadio" value="pan"> Pan</label>
+          <label style="margin-right:12px;"><input type="radio" name="annoMode" id="zoomInModeRadio" value="zoomIn"> Zoom In</label>
+          <label style="margin-right:12px;"><input type="radio" name="annoMode" id="zoomOutModeRadio" value="zoomOut"> Zoom Out</label>
+          <label><input type="radio" name="annoMode" id="zoomResetModeRadio" value="reset"> Reset</label>
+        </div>
+        <canvas id="annotateCanvas" width="512" height="512" style="border:1px solid #ccc; background:#fafafa; cursor:crosshair; margin-top:0; margin-bottom:0;"></canvas>
+        <div id="imageName" style="margin-top:10px;"></div>
+        <div id="canvasInstructions" style="margin-top:8px; color:#888; font-size:0.98em;">
+          Click and drag to draw a box. Click a box to select. Drag corners/edges to resize. Drag inside to move.
+        </div>
+      </div>
+      <!-- Right: Labels and controls -->
+      <div class="anno-col" style="min-width:220px;max-width:260px;">
+        <div id="modeActionSection" style="margin-bottom:18px;">
+          <!-- Mode-specific actions will be rendered here by JS -->
+        </div>
+        <div class="anno-labels" id="labelsSection"></div>
+      </div>
+      <!-- Column 4: Add label -->
+      <div class="anno-col" style="min-width:180px;max-width:220px;">
+        <div style="margin-bottom:18px;">
+          <input type="text" id="newLabelInput" placeholder="Add new label..." class="form-control" />
+          <button id="addLabelBtn" class="anno-btn btn btn-secondary">Add Label</button>
+        </div>
+        <div id="annoMsg" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='manual_annotate.js') }}"></script>
+</body>
+</html>

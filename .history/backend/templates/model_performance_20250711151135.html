@@ -1,0 +1,50 @@
+  <div class="perf-section">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Model Performance</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .perf-table { border-collapse: collapse; width: 100%; margin-top: 32px; }
+    .perf-table th, .perf-table td { border: 1px solid #bbb; padding: 10px 16px; text-align: left; }
+    .perf-table th { background: #f5f5f5; font-weight: 600; }
+    .perf-table tr:nth-child(even) { background: #fafbfc; }
+    .perf-table tr:hover { background: #f0f4f8; }
+    .perf-desc { color: #666; font-size: 0.98em; }
+    .perf-title { font-size: 2rem; font-weight: 700; margin-bottom: 18px; color: #222; }
+    .perf-section { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 16px #0001; padding: 32px 36px; }
+  </style>
+</head>
+<body>
+  <div class="perf-section">
+    <div class="perf-title">Model Performance</div>
+    <table class="perf-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Description</th>
+          <th>Value</th>
+          <th>Why show this?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Epochs trained</td><td class="perf-desc">Number of fine-tuning epochs</td><td>{{ last_epoch }}</td><td class="perf-desc">Transparency and traceability</td></tr>
+        <tr><td>Final Train Loss</td><td class="perf-desc">Total loss on training set at last epoch</td><td>{{ last_train_loss }}</td><td class="perf-desc">Detect overfitting/underfitting</td></tr>
+        <tr><td>Final Val Loss</td><td class="perf-desc">Total loss on validation set at last epoch</td><td>{{ last_val_loss }}</td><td class="perf-desc">How well it performs on unseen data</td></tr>
+        <tr><td>mAP@0.5</td><td class="perf-desc">Mean average precision at 0.5 IoU threshold</td><td id="mp-map50">{{ last_map_50 }}</td><td class="perf-desc">Primary detection performance indicator</td></tr>
+        <tr><td>mAP@0.5:0.95</td><td class="perf-desc">Stricter, more robust mAP over multiple IoUs</td><td id="mp-map5095">{{ last_map_5095 }}</td><td class="perf-desc">Detect generalization capability</td></tr>
+        <tr><td>Precision</td><td class="perf-desc">Proportion of correct detections</td><td id="mp-precision">{{ last_precision }}</td><td class="perf-desc">Avoid too many false positives</td></tr>
+        <tr><td>Recall</td><td class="perf-desc">Proportion of actual objects detected</td><td id="mp-recall">{{ last_recall }}</td><td class="perf-desc">Avoid too many false negatives</td></tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+  
+ 
+  <!-- Chart.js and model_performance.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='model_performance.js') }}"></script>
+  
+</body>
+</html>

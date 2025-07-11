@@ -1,0 +1,10 @@
+ultralytics
+opencv-python
+torch
+torchvision
+pyyaml
+pillow
+streamlit
+streamlit-drawable-canvas
+flask
+flask-cors
