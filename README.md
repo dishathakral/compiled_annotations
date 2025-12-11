@@ -1,5 +1,12 @@
 # 🔥 AI-Powered Infrared Object Detection and Annotation Toolkit
 
+[![Python](https://img.shields.io/badge/Python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
+[![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-vision-orange.svg)](https://github.com/ultralytics/ultralytics)
+[![OpenCV](https://img.shields.io/badge/OpenCV-computer%20vision-brightgreen.svg)](https://opencv.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+
 A **web-based annotation system** for **infrared images**, integrating **YOLOv8**, manual/auto annotation, and custom model training.  
 Built with **Flask (Backend)** and **HTML/CSS/JS (Frontend)**.
 
