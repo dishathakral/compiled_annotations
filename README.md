@@ -40,6 +40,69 @@ This toolkit minimizes labeling effort with **AI-powered suggestions** and an **
 - 💾 **Local Project Handling:** Manage all project files locally for privacy and flexibility.
 
 ---
+## 📸 Application Screenshots
+
+### 🏠 Homepage & Project Dashboard
+<img src="assets/dashboard_annotation.png" width="500"/>
+
+- Manage projects (create, open, delete)
+- Central dashboard for navigation
+
+---
+
+### 📂 Dataset Upload & Management
+<img src="assets/dataset_upload.png" width="500"/>
+
+- Upload dataset (.zip)
+- View metadata like image count and paths
+- Replace datasets dynamically
+
+---
+
+### 🖍️ Manual Annotation Interface
+<img src="assets/manual_annotation.png" width="500"/>
+
+- Draw, resize, move, and delete bounding boxes
+- Assign labels dynamically
+- Save annotations in YOLO format
+
+---
+
+### 🤖 Auto Annotation (YOLOv8)
+<img src="assets/Auto_annotation.png" width="500"/>
+
+- Select model and version (YOLOv8)
+- Choose subset (full / manual / random)
+- One-click auto labeling
+
+---
+
+### 🔍 Prediction Review & Correction
+<img src="assets/view_prediction.png" width="500"/>
+
+- Visualize model predictions
+- Edit/delete incorrect bounding boxes
+- Save corrected annotations
+
+---
+
+### 🧠 Model Training & Fine-Tuning
+<p>
+  <img src="assets/model_training_1.png" width="45%"/>
+  <img src="assets/model_training_2.png" width="42%"/>
+</p>
+
+- Configure training parameters
+- Fine-tune model with updated annotations
+
+---
+
+### 📊 Model Performance Dashboard
+<img src="assets/model_perfromance.png" width="500"/>
+
+- View loss, precision, recall, mAP
+- Confusion matrix visualization
+- Keep or discard trained model
 
 ## 🔁 Project Workflow
 
